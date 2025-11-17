@@ -11,6 +11,7 @@
     /* Fixed chart size (adjustable) */
     --chart-width: 640px;
     --chart-height: 360px;
+    --chart-device-pixel-ratio: 2; /* Increase for higher quality (2x retina) */
     
     --bg-color: #F8F9FA;
     --card-bg: #FFFFFF;
@@ -106,9 +107,16 @@ h1 {
 #main-nav .container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: space-between;
     gap: 0.5rem;
     padding: 1rem 20px;
+    max-width: 100%;
+}
+
+@media (min-width: 769px) {
+    #main-nav .container {
+        justify-content: space-evenly;
+    }
 }
 
 .nav-btn {

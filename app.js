@@ -58,6 +58,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const primary = (root.getPropertyValue('--primary-color') || '#2C3E50').trim();
         const textColor = (root.getPropertyValue('--text-color') || '#2C3E50').trim();
 
+        // Aumentar devicePixelRatio para gráficas de mayor calidad (menos pixeladas)
+        Chart.defaults.devicePixelRatio = 2; // 2x = Retina quality
+
         // Tipografía y colores por defecto
         Chart.defaults.color = textColor;
         Chart.defaults.font = Chart.defaults.font || {};
@@ -128,10 +131,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const chart = canvas.chart;
                 try {
                     return chart && typeof chart.toBase64Image === 'function'
-                        ? chart.toBase64Image()
-                        : canvas.toDataURL('image/png');
+                        ? chart.toBase64Image('image/png', 1)
+                        : canvas.toDataURL('image/png', 1);
                 } catch (e) {
-                    return canvas.toDataURL('image/png');
+                    return canvas.toDataURL('image/png', 1);
                 }
             };
 
