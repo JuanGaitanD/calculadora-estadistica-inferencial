@@ -19,7 +19,8 @@
 
     <nav id="main-nav">
         <div class="container">
-            <button class="nav-btn active" data-section="distribuciones">Distribuciones de Probabilidad</button>
+            <button class="nav-btn active" data-section="home">Inicio</button>
+            <button class="nav-btn" data-section="distribuciones">Distribuciones de Probabilidad</button>
             <button class="nav-btn" data-section="muestreo">Tamaño de Muestra</button>
             <button class="nav-btn" data-section="estadisticos">Estadísticos Z y t</button>
             <button class="nav-btn" data-section="intervalos">Intervalos de Confianza</button>
@@ -28,9 +29,41 @@
     </nav>
 
     <main class="container">
+        <!-- HOME / INICIO -->
+        <section id="home" class="section active">
+            <h2>Bienvenido</h2>
+            <p class="lead">Selecciona un tema para comenzar. Encuentra calculadoras, fórmulas y gráficos interactivos.</p>
+            <div class="topics-grid">
+                <article class="topic-card">
+                    <h3>Distribuciones de Probabilidad</h3>
+                    <p>Binomial, Hipergeométrica, Poisson y Normal.</p>
+                    <button class="btn-link" data-section="distribuciones">Ir a la sección</button>
+                </article>
+                <article class="topic-card">
+                    <h3>Tamaño de Muestra</h3>
+                    <p>Para variables cuantitativas y proporciones, con corrección finita.</p>
+                    <button class="btn-link" data-section="muestreo">Ir a la sección</button>
+                </article>
+                <article class="topic-card">
+                    <h3>Estadísticos Z y t</h3>
+                    <p>Distribuciones muestrales para medias y proporciones.</p>
+                    <button class="btn-link" data-section="estadisticos">Ir a la sección</button>
+                </article>
+                <article class="topic-card">
+                    <h3>Intervalos de Confianza</h3>
+                    <p>Para medias, diferencias, proporciones y varianzas.</p>
+                    <button class="btn-link" data-section="intervalos">Ir a la sección</button>
+                </article>
+                <article class="topic-card">
+                    <h3>Pruebas de Hipótesis</h3>
+                    <p>Media, proporción, varianza y prueba F con interpretaciones.</p>
+                    <button class="btn-link" data-section="hipotesis">Ir a la sección</button>
+                </article>
+            </div>
+        </section>
         <!-- SECCIÓN I: DISTRIBUCIONES DE PROBABILIDAD -->
-        <section id="distribuciones" class="section active">
-            <h2>I. Distribuciones de Probabilidad</h2>
+        <section id="distribuciones" class="section">
+            <h2>Distribuciones de Probabilidad</h2>
             
             <!-- Distribución Binomial -->
             <div class="calculator-card">
@@ -91,7 +124,7 @@
 
         <!-- SECCIÓN II: TAMAÑO DE MUESTRA -->
         <section id="muestreo" class="section">
-            <h2>II. Tamaño de Muestra</h2>
+            <h2>Tamaño de Muestra</h2>
 
             <!-- Cuantitativa Población Grande -->
             <div class="calculator-card">
@@ -175,7 +208,7 @@
 
         <!-- SECCIÓN III: ESTADÍSTICOS Z y t -->
         <section id="estadisticos" class="section">
-            <h2>III. Distribuciones Muestrales (Estadísticos Z y t)</h2>
+            <h2>Distribuciones Muestrales (Estadísticos Z y t)</h2>
 
             <!-- Media - Una población (Z) -->
             <div class="calculator-card">
@@ -326,7 +359,7 @@
 
         <!-- SECCIÓN IV: INTERVALOS DE CONFIANZA -->
         <section id="intervalos" class="section">
-            <h2>IV. Intervalos de Confianza</h2>
+            <h2>Intervalos de Confianza</h2>
 
             <!-- Media (σ conocida) -->
             <div class="calculator-card">
@@ -494,7 +527,7 @@
 
         <!-- SECCIÓN V: PRUEBAS DE HIPÓTESIS -->
         <section id="hipotesis" class="section">
-            <h2>V. Pruebas de Hipótesis</h2>
+            <h2>Pruebas de Hipótesis</h2>
 
             <!-- Media (σ conocida) -->
             <div class="calculator-card">

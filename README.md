@@ -58,6 +58,24 @@ Incluye estructura completa de pruebas de hipótesis con:
 - **Visualizaciones Gráficas**: Gráficos interactivos con Chart.js para cada distribución
 - **Renderizado Matemático**: Fórmulas LaTeX renderizadas con MathJax
 
+### Tamaño de las gráficas (fijo y consistente)
+
+Desde la versión 1.0.1, las gráficas se muestran con un tamaño fijo y consistente en todas las pantallas para evitar que se vean desproporcionadas en monitores grandes.
+
+- Ancho por defecto: 640px (máximo 100% del contenedor)
+- Alto por defecto: 360px
+
+Puedes ajustar estos valores editando las variables CSS en `styles.css`:
+
+```
+:root {
+	--chart-width: 640px;
+	--chart-height: 360px;
+}
+```
+
+En móviles, la altura se compacta ligeramente para mejorar la legibilidad sin perder consistencia visual.
+
 ## 🚀 Uso
 
 ### Abrir la Aplicación

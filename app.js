@@ -6,32 +6,91 @@ document.addEventListener('DOMContentLoaded', function() {
     // Navegación entre secciones
     const navButtons = document.querySelectorAll('.nav-btn');
     const sections = document.querySelectorAll('.section');
+    const sectionById = id => Array.from(sections).find(s => s.id === id);
+    const navBtnBySection = id => Array.from(navButtons).find(b => b.getAttribute('data-section') === id);
+    
+    function navigateToSection(targetSection) {
+        if (!targetSection) return;
+        // Actualizar botones activos
+        navButtons.forEach(btn => btn.classList.remove('active'));
+        const navBtn = navBtnBySection(targetSection);
+        if (navBtn) {
+            navBtn.classList.add('active');
+            navButtons.forEach(btn => btn.removeAttribute('aria-current'));
+            navBtn.setAttribute('aria-current', 'page');
+        }
+        // Mostrar sección
+        sections.forEach(section => {
+            section.classList.remove('active');
+            if (section.id === targetSection) {
+                section.classList.add('active');
+            }
+        });
+        // Scroll suave al inicio
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     
     navButtons.forEach(button => {
         button.addEventListener('click', function() {
             const targetSection = this.getAttribute('data-section');
-            
-            // Actualizar botones activos
-            navButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Mostrar sección correspondiente
-            sections.forEach(section => {
-                section.classList.remove('active');
-                if (section.id === targetSection) {
-                    section.classList.add('active');
-                }
-            });
-            
-            // Scroll suave al inicio
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            navigateToSection(targetSection);
         });
+    });
+
+    // Delegación: botones/enlaces dentro del contenido que tengan data-section
+    document.body.addEventListener('click', (e) => {
+        const el = e.target.closest('[data-section]');
+        if (el && !el.classList.contains('nav-btn')) {
+            e.preventDefault();
+            const target = el.getAttribute('data-section');
+            navigateToSection(target);
+        }
     });
     
     // Renderizar MathJax si está disponible
     if (window.MathJax) {
         MathJax.typesetPromise();
     }
+
+    // Ajustes globales de Chart.js para mejorar títulos y legiblez
+    if (window.Chart) {
+        const root = getComputedStyle(document.documentElement);
+        const primary = (root.getPropertyValue('--primary-color') || '#2C3E50').trim();
+        const textColor = (root.getPropertyValue('--text-color') || '#2C3E50').trim();
+
+        // Tipografía y colores por defecto
+        Chart.defaults.color = textColor;
+        Chart.defaults.font = Chart.defaults.font || {};
+        Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+        Chart.defaults.font.size = 12;
+
+        // Título más visible y con separación
+        Chart.defaults.plugins = Chart.defaults.plugins || {};
+        Chart.defaults.plugins.title = Chart.defaults.plugins.title || {};
+        // No forzamos display:true; solo estilos cuando se use título
+        Chart.defaults.plugins.title.font = { size: 18, weight: '700' };
+        Chart.defaults.plugins.title.color = primary;
+        Chart.defaults.plugins.title.align = 'center';
+        Chart.defaults.plugins.title.padding = { top: 10, bottom: 12 };
+
+        // Leyenda en la parte inferior para no competir con el título
+        Chart.defaults.plugins.legend = Chart.defaults.plugins.legend || {};
+        Chart.defaults.plugins.legend.position = 'bottom';
+        Chart.defaults.plugins.legend.labels = Chart.defaults.plugins.legend.labels || {};
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+        Chart.defaults.plugins.legend.labels.boxWidth = 10;
+
+        // Separación interna del lienzo
+        Chart.defaults.layout = Chart.defaults.layout || {};
+        Chart.defaults.layout.padding = { top: 8, right: 8, bottom: 8, left: 8 };
+    }
+
+    // Marcar cards que tienen gráfica (fallback si :has no está disponible)
+    document.querySelectorAll('.calculator-card').forEach(card => {
+        if (card.querySelector('canvas')) {
+            card.classList.add('has-chart');
+        }
+    });
 });
 
 // Funciones matemáticas auxiliares
@@ -2103,6 +2162,9 @@ function mostrarResultado(elementId, contenido, tipo = 'info') {
     
     elemento.innerHTML = contenido;
     elemento.className = 'result';
+    // Accesibilidad: anunciar cambios de resultados
+    elemento.setAttribute('role', 'status');
+    elemento.setAttribute('aria-live', 'polite');
     
     if (tipo === 'success') {
         elemento.classList.add('result-success');
