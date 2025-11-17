@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadística Stiven Universe - Calculadora de Estadística Inferencial</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>✨ Estadística Stiven Universe</h1>
+            <p class="subtitle">Calculadora de Estadística Inferencial</p>
+        </div>
+    </header>
+
+    <nav id="main-nav">
+        <div class="container">
+            <button class="nav-btn active" data-section="distribuciones">Distribuciones de Probabilidad</button>
+            <button class="nav-btn" data-section="muestreo">Tamaño de Muestra</button>
+            <button class="nav-btn" data-section="estadisticos">Estadísticos Z y t</button>
+            <button class="nav-btn" data-section="intervalos">Intervalos de Confianza</button>
+            <button class="nav-btn" data-section="hipotesis">Pruebas de Hipótesis</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- SECCIÓN I: DISTRIBUCIONES DE PROBABILIDAD -->
+        <section id="distribuciones" class="section active">
+            <h2>I. Distribuciones de Probabilidad</h2>
+            
+            <!-- Distribución Binomial -->
+            <div class="calculator-card">
+                <h3>📊 Distribución Binomial</h3>
+                <p class="formula">\(P(X=x) = \binom{n}{x} p^x q^{n-x}\)</p>
+                <div class="input-group">
+                    <label>n (tamaño de muestra): <input type="number" id="binomial-n" min="1" value="10"></label>
+                    <label>x (número de éxitos): <input type="number" id="binomial-x" min="0" value="3"></label>
+                    <label>p (probabilidad de éxito): <input type="number" id="binomial-p" min="0" max="1" step="0.01" value="0.5"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularBinomial()">Calcular</button>
+                <div id="binomial-result" class="result"></div>
+                <canvas id="binomial-chart"></canvas>
+            </div>
+
+            <!-- Distribución Hipergeométrica -->
+            <div class="calculator-card">
+                <h3>📊 Distribución Hipergeométrica</h3>
+                <p class="formula">\(P(X=x) = \frac{\binom{N_1}{x} \binom{N_2}{n-x}}{\binom{N_1+N_2}{n}}\)</p>
+                <div class="input-group">
+                    <label>n (tamaño de muestra): <input type="number" id="hiper-n" min="1" value="10"></label>
+                    <label>x (número de éxitos): <input type="number" id="hiper-x" min="0" value="3"></label>
+                    <label>N₁ (característica 1): <input type="number" id="hiper-n1" min="1" value="20"></label>
+                    <label>N₂ (característica 2): <input type="number" id="hiper-n2" min="0" value="30"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularHipergeometrica()">Calcular</button>
+                <div id="hiper-result" class="result"></div>
+                <canvas id="hiper-chart"></canvas>
+            </div>
+
+            <!-- Distribución de Poisson -->
+            <div class="calculator-card">
+                <h3>📊 Distribución de Poisson</h3>
+                <p class="formula">\(P(X=x) = \frac{e^{-\lambda} \lambda^x}{x!}\)</p>
+                <div class="input-group">
+                    <label>λ (tasa promedio): <input type="number" id="poisson-lambda" min="0" step="0.1" value="3.5"></label>
+                    <label>x (número de ocurrencias): <input type="number" id="poisson-x" min="0" value="2"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularPoisson()">Calcular</button>
+                <div id="poisson-result" class="result"></div>
+                <canvas id="poisson-chart"></canvas>
+            </div>
+
+            <!-- Distribución Normal -->
+            <div class="calculator-card">
+                <h3>📊 Distribución Normal</h3>
+                <p class="formula">\(Z = \frac{X - \mu}{\sigma}\)</p>
+                <div class="input-group">
+                    <label>μ (media poblacional): <input type="number" id="normal-mu" step="0.1" value="100"></label>
+                    <label>σ (desviación estándar): <input type="number" id="normal-sigma" min="0.01" step="0.1" value="15"></label>
+                    <label>X (valor observado): <input type="number" id="normal-x" step="0.1" value="110"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularNormal()">Calcular</button>
+                <div id="normal-result" class="result"></div>
+                <canvas id="normal-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- SECCIÓN II: TAMAÑO DE MUESTRA -->
+        <section id="muestreo" class="section">
+            <h2>II. Tamaño de Muestra</h2>
+
+            <!-- Cuantitativa Población Grande -->
+            <div class="calculator-card">
+                <h3>📏 Cuantitativa (Población Grande, σ conocida)</h3>
+                <p class="formula">\(n = \frac{z^2 \sigma^2}{e^2}\)</p>
+                <div class="input-group">
+                    <label>σ² (varianza poblacional): <input type="number" id="muestra-cuant-var" min="0" step="0.1" value="100"></label>
+                    <label>e (margen de error): <input type="number" id="muestra-cuant-e" min="0.01" step="0.01" value="5"></label>
+                    <label>Nivel de confianza (%): 
+                        <select id="muestra-cuant-conf">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn-calculate" onclick="calcularMuestraCuantGrande()">Calcular</button>
+                <div id="muestra-cuant-result" class="result"></div>
+            </div>
+
+            <!-- Cuantitativa Población Pequeña -->
+            <div class="calculator-card">
+                <h3>📏 Cuantitativa (Población Pequeña, σ desconocida)</h3>
+                <p class="formula">\(n = \frac{t^2 s^2}{e^2}\)</p>
+                <div class="input-group">
+                    <label>s² (varianza muestral): <input type="number" id="muestra-t-var" min="0" step="0.1" value="100"></label>
+                    <label>e (margen de error): <input type="number" id="muestra-t-e" min="0.01" step="0.01" value="5"></label>
+                    <label>Grados de libertad (n-1): <input type="number" id="muestra-t-gl" min="1" value="29"></label>
+                    <label>Nivel de confianza (%): 
+                        <select id="muestra-t-conf">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn-calculate" onclick="calcularMuestraCuantPequena()">Calcular</button>
+                <div id="muestra-t-result" class="result"></div>
+            </div>
+
+            <!-- Cualitativa (Proporción) -->
+            <div class="calculator-card">
+                <h3>📏 Cualitativa (Proporción)</h3>
+                <p class="formula">\(n = \frac{z^2 pq}{e^2}\)</p>
+                <div class="input-group">
+                    <label>p (probabilidad de éxito): <input type="number" id="muestra-prop-p" min="0" max="1" step="0.01" value="0.5"></label>
+                    <label>e (margen de error): <input type="number" id="muestra-prop-e" min="0.01" max="1" step="0.01" value="0.05"></label>
+                    <label>Nivel de confianza (%): 
+                        <select id="muestra-prop-conf">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn-calculate" onclick="calcularMuestraCualitativa()">Calcular</button>
+                <div id="muestra-prop-result" class="result"></div>
+            </div>
+
+            <!-- Corrección para Población Conocida -->
+            <div class="calculator-card">
+                <h3>📏 Corrección para Población Conocida</h3>
+                <p class="formula">\(n_{ajustado} = \frac{Nz^2pq}{(N-1)e^2 + z^2pq}\)</p>
+                <div class="input-group">
+                    <label>N (tamaño población): <input type="number" id="corr-N" min="1" value="1000"></label>
+                    <label>n (muestra calculada): <input type="number" id="corr-n" min="1" value="384"></label>
+                    <label>p (probabilidad de éxito): <input type="number" id="corr-p" min="0" max="1" step="0.01" value="0.5"></label>
+                    <label>e (margen de error): <input type="number" id="corr-e" min="0.01" max="1" step="0.01" value="0.05"></label>
+                    <label>Nivel de confianza (%): 
+                        <select id="corr-conf">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn-calculate" onclick="calcularCorreccionMuestra()">Calcular</button>
+                <div id="corr-result" class="result"></div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN III: ESTADÍSTICOS Z y t -->
+        <section id="estadisticos" class="section">
+            <h2>III. Distribuciones Muestrales (Estadísticos Z y t)</h2>
+
+            <!-- Media - Una población (Z) -->
+            <div class="calculator-card">
+                <h3>📈 Media - Una Población (Z)</h3>
+                <p class="formula">\(Z = \frac{\bar{x} - \mu}{\sigma / \sqrt{n}}\)</p>
+                <div class="input-group">
+                    <label>x̄ (media muestral): <input type="number" id="z-media-xbar" step="0.01" value="105"></label>
+                    <label>μ (media poblacional): <input type="number" id="z-media-mu" step="0.01" value="100"></label>
+                    <label>σ (desviación estándar poblacional): <input type="number" id="z-media-sigma" min="0.01" step="0.01" value="15"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="z-media-n" min="1" value="36"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularZMedia()">Calcular</button>
+                <div id="z-media-result" class="result"></div>
+                <canvas id="z-media-chart"></canvas>
+            </div>
+
+            <!-- Media - Dos poblaciones (Z) -->
+            <div class="calculator-card">
+                <h3>📈 Media - Dos Poblaciones (Z)</h3>
+                <p class="formula">\(Z = \frac{(\bar{x} - \bar{y}) - (\mu_x - \mu_y)}{\sqrt{\frac{\sigma_x^2}{n_x} + \frac{\sigma_y^2}{n_y}}}\)</p>
+                <div class="input-group">
+                    <div class="input-row">
+                        <label>x̄ (media muestra 1): <input type="number" id="z-2media-xbar" step="0.01" value="105"></label>
+                        <label>ȳ (media muestra 2): <input type="number" id="z-2media-ybar" step="0.01" value="100"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>μₓ (media poblacional 1): <input type="number" id="z-2media-mux" step="0.01" value="100"></label>
+                        <label>μᵧ (media poblacional 2): <input type="number" id="z-2media-muy" step="0.01" value="100"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>σₓ (desv. est. 1): <input type="number" id="z-2media-sigmax" min="0.01" step="0.01" value="15"></label>
+                        <label>σᵧ (desv. est. 2): <input type="number" id="z-2media-sigmay" min="0.01" step="0.01" value="15"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>nₓ (muestra 1): <input type="number" id="z-2media-nx" min="1" value="36"></label>
+                        <label>nᵧ (muestra 2): <input type="number" id="z-2media-ny" min="1" value="36"></label>
+                    </div>
+                </div>
+                <button class="btn-calculate" onclick="calcularZDosMedias()">Calcular</button>
+                <div id="z-2media-result" class="result"></div>
+            </div>
+
+            <!-- Proporción - Una población (Z) -->
+            <div class="calculator-card">
+                <h3>📈 Proporción - Una Población (Z)</h3>
+                <p class="formula">\(Z = \frac{\bar{p} - P}{\sqrt{\frac{PQ}{n}}}\)</p>
+                <div class="input-group">
+                    <label>p̄ (proporción muestral): <input type="number" id="z-prop-pbar" min="0" max="1" step="0.01" value="0.55"></label>
+                    <label>P (proporción poblacional): <input type="number" id="z-prop-P" min="0" max="1" step="0.01" value="0.5"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="z-prop-n" min="1" value="100"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularZProporcion()">Calcular</button>
+                <div id="z-prop-result" class="result"></div>
+            </div>
+
+            <!-- Proporción - Dos poblaciones (Z) -->
+            <div class="calculator-card">
+                <h3>📈 Proporción - Dos Poblaciones (Z)</h3>
+                <p class="formula">\(Z = \frac{(\bar{p}_1 - \bar{p}_2) - (P_1 - P_2)}{\sqrt{\frac{P_1Q_1}{n_1} + \frac{P_2Q_2}{n_2}}}\)</p>
+                <div class="input-group">
+                    <div class="input-row">
+                        <label>p̄₁ (prop. muestral 1): <input type="number" id="z-2prop-pbar1" min="0" max="1" step="0.01" value="0.55"></label>
+                        <label>p̄₂ (prop. muestral 2): <input type="number" id="z-2prop-pbar2" min="0" max="1" step="0.01" value="0.50"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>P₁ (prop. poblacional 1): <input type="number" id="z-2prop-P1" min="0" max="1" step="0.01" value="0.5"></label>
+                        <label>P₂ (prop. poblacional 2): <input type="number" id="z-2prop-P2" min="0" max="1" step="0.01" value="0.5"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>n₁ (muestra 1): <input type="number" id="z-2prop-n1" min="1" value="100"></label>
+                        <label>n₂ (muestra 2): <input type="number" id="z-2prop-n2" min="1" value="100"></label>
+                    </div>
+                </div>
+                <button class="btn-calculate" onclick="calcularZDosProporcion()">Calcular</button>
+                <div id="z-2prop-result" class="result"></div>
+            </div>
+
+            <!-- Media - Una población (t) -->
+            <div class="calculator-card">
+                <h3>📈 Media - Una Población (t)</h3>
+                <p class="formula">\(t = \frac{\bar{x} - \mu}{S / \sqrt{n}}\)</p>
+                <div class="input-group">
+                    <label>x̄ (media muestral): <input type="number" id="t-media-xbar" step="0.01" value="105"></label>
+                    <label>μ (media poblacional): <input type="number" id="t-media-mu" step="0.01" value="100"></label>
+                    <label>S (desviación estándar muestral): <input type="number" id="t-media-s" min="0.01" step="0.01" value="15"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="t-media-n" min="2" value="25"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularTMedia()">Calcular</button>
+                <div id="t-media-result" class="result"></div>
+                <canvas id="t-media-chart"></canvas>
+            </div>
+
+            <!-- Media - Dos poblaciones (t) -->
+            <div class="calculator-card">
+                <h3>📈 Media - Dos Poblaciones (t)</h3>
+                <p class="formula">\(t = \frac{(\bar{x} - \bar{y}) - (\mu_x - \mu_y)}{S_p\sqrt{\frac{1}{n_x} + \frac{1}{n_y}}}\)</p>
+                <div class="input-group">
+                    <div class="input-row">
+                        <label>x̄ (media muestra 1): <input type="number" id="t-2media-xbar" step="0.01" value="105"></label>
+                        <label>ȳ (media muestra 2): <input type="number" id="t-2media-ybar" step="0.01" value="100"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>μₓ (media poblacional 1): <input type="number" id="t-2media-mux" step="0.01" value="100"></label>
+                        <label>μᵧ (media poblacional 2): <input type="number" id="t-2media-muy" step="0.01" value="100"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>Sₓ (desv. est. muestral 1): <input type="number" id="t-2media-sx" min="0.01" step="0.01" value="15"></label>
+                        <label>Sᵧ (desv. est. muestral 2): <input type="number" id="t-2media-sy" min="0.01" step="0.01" value="15"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>nₓ (muestra 1): <input type="number" id="t-2media-nx" min="2" value="25"></label>
+                        <label>nᵧ (muestra 2): <input type="number" id="t-2media-ny" min="2" value="25"></label>
+                    </div>
+                </div>
+                <button class="btn-calculate" onclick="calcularTDosMedias()">Calcular</button>
+                <div id="t-2media-result" class="result"></div>
+            </div>
+
+            <!-- Varianza - Una población (χ²) -->
+            <div class="calculator-card">
+                <h3>📈 Varianza - Una Población (χ²)</h3>
+                <p class="formula">\(\chi^2 = \frac{(n-1)S^2}{\sigma^2}\)</p>
+                <div class="input-group">
+                    <label>S² (varianza muestral): <input type="number" id="chi-var-s2" min="0.01" step="0.01" value="225"></label>
+                    <label>σ² (varianza poblacional): <input type="number" id="chi-var-sigma2" min="0.01" step="0.01" value="200"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="chi-var-n" min="2" value="25"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularChiVarianza()">Calcular</button>
+                <div id="chi-var-result" class="result"></div>
+                <canvas id="chi-var-chart"></canvas>
+            </div>
+
+            <!-- Varianza - Dos poblaciones (F) -->
+            <div class="calculator-card">
+                <h3>📈 Varianza - Dos Poblaciones (F)</h3>
+                <p class="formula">\(F = \frac{S_x^2}{S_y^2}\)</p>
+                <div class="input-group">
+                    <label>S²ₓ (varianza muestral 1): <input type="number" id="f-var-sx2" min="0.01" step="0.01" value="225"></label>
+                    <label>S²ᵧ (varianza muestral 2): <input type="number" id="f-var-sy2" min="0.01" step="0.01" value="200"></label>
+                    <label>nₓ (muestra 1): <input type="number" id="f-var-nx" min="2" value="25"></label>
+                    <label>nᵧ (muestra 2): <input type="number" id="f-var-ny" min="2" value="25"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularFVarianza()">Calcular</button>
+                <div id="f-var-result" class="result"></div>
+                <canvas id="f-var-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- SECCIÓN IV: INTERVALOS DE CONFIANZA -->
+        <section id="intervalos" class="section">
+            <h2>IV. Intervalos de Confianza</h2>
+
+            <!-- Media (σ conocida) -->
+            <div class="calculator-card">
+                <h3>🎯 Media (σ conocida)</h3>
+                <p class="formula">\(\bar{X} \pm Z_{1-\alpha/2} \frac{\sigma}{\sqrt{n}}\)</p>
+                <div class="input-group">
+                    <label>X̄ (media muestral): <input type="number" id="ic-media-xbar" step="0.01" value="105"></label>
+                    <label>σ (desviación estándar poblacional): <input type="number" id="ic-media-sigma" min="0.01" step="0.01" value="15"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="ic-media-n" min="1" value="36"></label>
+                    <label>Nivel de confianza (%): 
+                        <select id="ic-media-conf">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn-calculate" onclick="calcularICMedia()">Calcular</button>
+                <div id="ic-media-result" class="result"></div>
+                <canvas id="ic-media-chart"></canvas>
+            </div>
+
+            <!-- Media (σ desconocida) -->
+            <div class="calculator-card">
+                <h3>🎯 Media (σ desconocida)</h3>
+                <p class="formula">\(\bar{X} \pm t_{n-1;1-\alpha/2} \frac{S}{\sqrt{n}}\)</p>
+                <div class="input-group">
+                    <label>X̄ (media muestral): <input type="number" id="ic-media-t-xbar" step="0.01" value="105"></label>
+                    <label>S (desviación estándar muestral): <input type="number" id="ic-media-t-s" min="0.01" step="0.01" value="15"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="ic-media-t-n" min="2" value="25"></label>
+                    <label>Nivel de confianza (%): 
+                        <select id="ic-media-t-conf">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn-calculate" onclick="calcularICMediaT()">Calcular</button>
+                <div id="ic-media-t-result" class="result"></div>
+                <canvas id="ic-media-t-chart"></canvas>
+            </div>
+
+            <!-- Diferencia de Medias (σ conocidas) -->
+            <div class="calculator-card">
+                <h3>🎯 Diferencia de Medias (σ conocidas)</h3>
+                <p class="formula">\((\bar{X} - \bar{Y}) \pm Z_{1-\alpha/2} \sqrt{\frac{\sigma_X^2}{n_X} + \frac{\sigma_Y^2}{n_Y}}\)</p>
+                <div class="input-group">
+                    <div class="input-row">
+                        <label>X̄ (media muestra 1): <input type="number" id="ic-dif-media-xbar" step="0.01" value="105"></label>
+                        <label>Ȳ (media muestra 2): <input type="number" id="ic-dif-media-ybar" step="0.01" value="100"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>σₓ (desv. est. poblacional 1): <input type="number" id="ic-dif-media-sigmax" min="0.01" step="0.01" value="15"></label>
+                        <label>σᵧ (desv. est. poblacional 2): <input type="number" id="ic-dif-media-sigmay" min="0.01" step="0.01" value="15"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>nₓ (muestra 1): <input type="number" id="ic-dif-media-nx" min="1" value="36"></label>
+                        <label>nᵧ (muestra 2): <input type="number" id="ic-dif-media-ny" min="1" value="36"></label>
+                    </div>
+                    <label>Nivel de confianza (%): 
+                        <select id="ic-dif-media-conf">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn-calculate" onclick="calcularICDifMedias()">Calcular</button>
+                <div id="ic-dif-media-result" class="result"></div>
+            </div>
+
+            <!-- Diferencia de Medias (σ desconocidas) -->
+            <div class="calculator-card">
+                <h3>🎯 Diferencia de Medias (σ desconocidas e iguales)</h3>
+                <p class="formula">\((\bar{X} - \bar{Y}) \pm t_{k;1-\alpha/2} S_p \sqrt{\frac{1}{n_X} + \frac{1}{n_Y}}\)</p>
+                <div class="input-group">
+                    <div class="input-row">
+                        <label>X̄ (media muestra 1): <input type="number" id="ic-dif-media-t-xbar" step="0.01" value="105"></label>
+                        <label>Ȳ (media muestra 2): <input type="number" id="ic-dif-media-t-ybar" step="0.01" value="100"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>S²ₓ (varianza muestral 1): <input type="number" id="ic-dif-media-t-sx2" min="0.01" step="0.01" value="225"></label>
+                        <label>S²ᵧ (varianza muestral 2): <input type="number" id="ic-dif-media-t-sy2" min="0.01" step="0.01" value="225"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>nₓ (muestra 1): <input type="number" id="ic-dif-media-t-nx" min="2" value="25"></label>
+                        <label>nᵧ (muestra 2): <input type="number" id="ic-dif-media-t-ny" min="2" value="25"></label>
+                    </div>
+                    <label>Nivel de confianza (%): 
+                        <select id="ic-dif-media-t-conf">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn-calculate" onclick="calcularICDifMediasT()">Calcular</button>
+                <div id="ic-dif-media-t-result" class="result"></div>
+            </div>
+
+            <!-- Proporción -->
+            <div class="calculator-card">
+                <h3>🎯 Proporción</h3>
+                <p class="formula">\(\bar{P} \pm Z_{1-\alpha/2} \sqrt{\frac{\bar{P}(1-\bar{P})}{n}}\)</p>
+                <div class="input-group">
+                    <label>P̄ (proporción muestral): <input type="number" id="ic-prop-pbar" min="0" max="1" step="0.01" value="0.6"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="ic-prop-n" min="1" value="100"></label>
+                    <label>Nivel de confianza (%): 
+                        <select id="ic-prop-conf">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn-calculate" onclick="calcularICProporcion()">Calcular</button>
+                <div id="ic-prop-result" class="result"></div>
+            </div>
+
+            <!-- Diferencia de Proporciones -->
+            <div class="calculator-card">
+                <h3>🎯 Diferencia de Proporciones</h3>
+                <p class="formula">\((\bar{P}_1 - \bar{P}_2) \pm Z_{1-\alpha/2} \sqrt{\frac{\bar{P}_1(1-\bar{P}_1)}{n_1} + \frac{\bar{P}_2(1-\bar{P}_2)}{n_2}}\)</p>
+                <div class="input-group">
+                    <div class="input-row">
+                        <label>P̄₁ (prop. muestral 1): <input type="number" id="ic-dif-prop-p1" min="0" max="1" step="0.01" value="0.65"></label>
+                        <label>P̄₂ (prop. muestral 2): <input type="number" id="ic-dif-prop-p2" min="0" max="1" step="0.01" value="0.55"></label>
+                    </div>
+                    <div class="input-row">
+                        <label>n₁ (muestra 1): <input type="number" id="ic-dif-prop-n1" min="1" value="100"></label>
+                        <label>n₂ (muestra 2): <input type="number" id="ic-dif-prop-n2" min="1" value="100"></label>
+                    </div>
+                    <label>Nivel de confianza (%): 
+                        <select id="ic-dif-prop-conf">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn-calculate" onclick="calcularICDifProporciones()">Calcular</button>
+                <div id="ic-dif-prop-result" class="result"></div>
+            </div>
+
+            <!-- Varianza -->
+            <div class="calculator-card">
+                <h3>🎯 Varianza</h3>
+                <p class="formula">\(\left[\frac{(n-1)S^2}{\chi^2_{(n-1;1-\alpha/2)}}, \frac{(n-1)S^2}{\chi^2_{(n-1;\alpha/2)}}\right]\)</p>
+                <div class="input-group">
+                    <label>S² (varianza muestral): <input type="number" id="ic-var-s2" min="0.01" step="0.01" value="225"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="ic-var-n" min="2" value="25"></label>
+                    <label>Nivel de confianza (%): 
+                        <select id="ic-var-conf">
+                            <option value="90">90%</option>
+                            <option value="95" selected>95%</option>
+                            <option value="99">99%</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="btn-calculate" onclick="calcularICVarianza()">Calcular</button>
+                <div id="ic-var-result" class="result"></div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN V: PRUEBAS DE HIPÓTESIS -->
+        <section id="hipotesis" class="section">
+            <h2>V. Pruebas de Hipótesis</h2>
+
+            <!-- Media (σ conocida) -->
+            <div class="calculator-card">
+                <h3>🔬 Prueba de Hipótesis: Media (σ conocida)</h3>
+                <div class="input-group">
+                    <label>Tipo de prueba:
+                        <select id="ph-media-tipo">
+                            <option value="bilateral">Bilateral (≠)</option>
+                            <option value="derecha">Cola derecha (>)</option>
+                            <option value="izquierda">Cola izquierda (<)</option>
+                        </select>
+                    </label>
+                    <label>μ₀ (valor hipotético): <input type="number" id="ph-media-mu0" step="0.01" value="100"></label>
+                    <label>x̄ (media muestral): <input type="number" id="ph-media-xbar" step="0.01" value="105"></label>
+                    <label>σ (desviación estándar poblacional): <input type="number" id="ph-media-sigma" min="0.01" step="0.01" value="15"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="ph-media-n" min="1" value="36"></label>
+                    <label>α (nivel de significancia): <input type="number" id="ph-media-alpha" min="0.001" max="0.5" step="0.001" value="0.05"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularPHMedia()">Calcular</button>
+                <div id="ph-media-result" class="result"></div>
+                <canvas id="ph-media-chart"></canvas>
+            </div>
+
+            <!-- Media (σ desconocida) -->
+            <div class="calculator-card">
+                <h3>🔬 Prueba de Hipótesis: Media (σ desconocida)</h3>
+                <div class="input-group">
+                    <label>Tipo de prueba:
+                        <select id="ph-media-t-tipo">
+                            <option value="bilateral">Bilateral (≠)</option>
+                            <option value="derecha">Cola derecha (>)</option>
+                            <option value="izquierda">Cola izquierda (<)</option>
+                        </select>
+                    </label>
+                    <label>μ₀ (valor hipotético): <input type="number" id="ph-media-t-mu0" step="0.01" value="100"></label>
+                    <label>x̄ (media muestral): <input type="number" id="ph-media-t-xbar" step="0.01" value="105"></label>
+                    <label>S (desviación estándar muestral): <input type="number" id="ph-media-t-s" min="0.01" step="0.01" value="15"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="ph-media-t-n" min="2" value="25"></label>
+                    <label>α (nivel de significancia): <input type="number" id="ph-media-t-alpha" min="0.001" max="0.5" step="0.001" value="0.05"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularPHMediaT()">Calcular</button>
+                <div id="ph-media-t-result" class="result"></div>
+                <canvas id="ph-media-t-chart"></canvas>
+            </div>
+
+            <!-- Proporción -->
+            <div class="calculator-card">
+                <h3>🔬 Prueba de Hipótesis: Proporción</h3>
+                <div class="input-group">
+                    <label>Tipo de prueba:
+                        <select id="ph-prop-tipo">
+                            <option value="bilateral">Bilateral (≠)</option>
+                            <option value="derecha">Cola derecha (>)</option>
+                            <option value="izquierda">Cola izquierda (<)</option>
+                        </select>
+                    </label>
+                    <label>P₀ (proporción hipotética): <input type="number" id="ph-prop-p0" min="0" max="1" step="0.01" value="0.5"></label>
+                    <label>p̄ (proporción muestral): <input type="number" id="ph-prop-pbar" min="0" max="1" step="0.01" value="0.6"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="ph-prop-n" min="1" value="100"></label>
+                    <label>α (nivel de significancia): <input type="number" id="ph-prop-alpha" min="0.001" max="0.5" step="0.001" value="0.05"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularPHProporcion()">Calcular</button>
+                <div id="ph-prop-result" class="result"></div>
+                <canvas id="ph-prop-chart"></canvas>
+            </div>
+
+            <!-- Varianza -->
+            <div class="calculator-card">
+                <h3>🔬 Prueba de Hipótesis: Varianza</h3>
+                <div class="input-group">
+                    <label>Tipo de prueba:
+                        <select id="ph-var-tipo">
+                            <option value="bilateral">Bilateral (≠)</option>
+                            <option value="derecha">Cola derecha (>)</option>
+                            <option value="izquierda">Cola izquierda (<)</option>
+                        </select>
+                    </label>
+                    <label>σ²₀ (varianza hipotética): <input type="number" id="ph-var-sigma20" min="0.01" step="0.01" value="200"></label>
+                    <label>S² (varianza muestral): <input type="number" id="ph-var-s2" min="0.01" step="0.01" value="225"></label>
+                    <label>n (tamaño de muestra): <input type="number" id="ph-var-n" min="2" value="25"></label>
+                    <label>α (nivel de significancia): <input type="number" id="ph-var-alpha" min="0.001" max="0.5" step="0.001" value="0.05"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularPHVarianza()">Calcular</button>
+                <div id="ph-var-result" class="result"></div>
+                <canvas id="ph-var-chart"></canvas>
+            </div>
+
+            <!-- Dos Varianzas (F) -->
+            <div class="calculator-card">
+                <h3>🔬 Prueba de Hipótesis: Dos Varianzas (F)</h3>
+                <div class="input-group">
+                    <label>Tipo de prueba:
+                        <select id="ph-f-tipo">
+                            <option value="bilateral">Bilateral (≠)</option>
+                            <option value="derecha">Cola derecha (>)</option>
+                        </select>
+                    </label>
+                    <label>S²₁ (varianza muestral 1): <input type="number" id="ph-f-s21" min="0.01" step="0.01" value="250"></label>
+                    <label>S²₂ (varianza muestral 2): <input type="number" id="ph-f-s22" min="0.01" step="0.01" value="200"></label>
+                    <label>n₁ (muestra 1): <input type="number" id="ph-f-n1" min="2" value="25"></label>
+                    <label>n₂ (muestra 2): <input type="number" id="ph-f-n2" min="2" value="25"></label>
+                    <label>α (nivel de significancia): <input type="number" id="ph-f-alpha" min="0.001" max="0.5" step="0.001" value="0.05"></label>
+                </div>
+                <button class="btn-calculate" onclick="calcularPHDosVarianzas()">Calcular</button>
+                <div id="ph-f-result" class="result"></div>
+                <canvas id="ph-f-chart"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>✨ Estadística Stiven Universe - Calculadora de Estadística Inferencial © 2025</p>
+            <p>Creado con ❤️ para facilitar el aprendizaje estadístico</p>
+        </div>
+    </footer>
+
+    <script src="tables.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
