@@ -91,6 +91,98 @@ document.addEventListener('DOMContentLoaded', function() {
             card.classList.add('has-chart');
         }
     });
+
+    // Envolver cada canvas con una toolbar de acciones (ver grande / descargar)
+    document.querySelectorAll('canvas').forEach(canvas => {
+        // Crear wrapper si no existe
+        if (!canvas.parentElement.classList.contains('chart-wrapper')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'chart-wrapper';
+            canvas.parentElement.insertBefore(wrapper, canvas);
+            wrapper.appendChild(canvas);
+
+            // Crear acciones
+            const actions = document.createElement('div');
+            actions.className = 'chart-actions';
+
+            const btnView = document.createElement('button');
+            btnView.className = 'btn-icon';
+            btnView.type = 'button';
+            btnView.innerHTML = '&#128269;'; // 🔍 lupa
+            btnView.setAttribute('title', 'Ver grande');
+            btnView.setAttribute('aria-label', 'Ver grande');
+
+            const btnDownload = document.createElement('button');
+            btnDownload.className = 'btn-icon';
+            btnDownload.type = 'button';
+            btnDownload.innerHTML = '&#11015;'; // ⬇ flecha abajo
+            btnDownload.setAttribute('title', 'Descargar');
+            btnDownload.setAttribute('aria-label', 'Descargar');
+
+            actions.appendChild(btnView);
+            actions.appendChild(btnDownload);
+            wrapper.appendChild(actions);
+
+            // Handlers
+            const getChartImage = () => {
+                const chart = canvas.chart;
+                try {
+                    return chart && typeof chart.toBase64Image === 'function'
+                        ? chart.toBase64Image()
+                        : canvas.toDataURL('image/png');
+                } catch (e) {
+                    return canvas.toDataURL('image/png');
+                }
+            };
+
+            const getChartTitle = () => {
+                const chart = canvas.chart;
+                if (chart && chart.options && chart.options.plugins && chart.options.plugins.title && chart.options.plugins.title.text) {
+                    const t = chart.options.plugins.title.text;
+                    return Array.isArray(t) ? t.join(' ') : String(t);
+                }
+                return 'grafica';
+            };
+
+            btnView.addEventListener('click', () => {
+                const src = getChartImage();
+                const caption = getChartTitle();
+                const overlay = document.getElementById('modal-overlay');
+                const img = document.getElementById('modal-image');
+                const cap = document.getElementById('modal-caption');
+                if (overlay && img && cap) {
+                    img.src = src;
+                    cap.textContent = caption;
+                    overlay.classList.remove('hidden');
+                }
+            });
+
+            btnDownload.addEventListener('click', () => {
+                const src = getChartImage();
+                const a = document.createElement('a');
+                const filename = getChartTitle().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'grafica';
+                a.href = src;
+                a.download = `${filename}.png`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            });
+
+            // Permitir click en el canvas para ampliar
+            canvas.style.cursor = 'zoom-in';
+            canvas.addEventListener('click', () => btnView.click());
+        }
+    });
+
+    // Cierre del modal
+    const overlay = document.getElementById('modal-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay || e.target.classList.contains('modal-close')) {
+                overlay.classList.add('hidden');
+            }
+        });
+    }
 });
 
 // Funciones matemáticas auxiliares

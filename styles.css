@@ -256,8 +256,8 @@ main {
 .calculator-card:has(canvas) .btn-calculate { grid-area: button; width: 100%; }
 .calculator-card.has-chart .result,
 .calculator-card:has(canvas) .result { grid-area: result; }
-.calculator-card.has-chart canvas,
-.calculator-card:has(canvas) canvas { grid-area: chart; align-self: start; }
+.calculator-card.has-chart .chart-wrapper,
+.calculator-card:has(canvas) .chart-wrapper { grid-area: chart; align-self: start; }
 
 /* INPUT GROUPS */
 .input-group {
@@ -391,6 +391,84 @@ canvas {
     padding: 0.5rem;
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow);
+}
+
+/* Wrapper de la gráfica con acciones */
+.chart-wrapper {
+    position: relative;
+}
+.chart-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 2;
+}
+.btn-icon {
+    background: rgba(255,255,255,0.9);
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all .2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-icon:hover { background: #fff; transform: translateY(-1px); }
+
+/* Modal de imagen */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 10000;
+}
+.modal-overlay.hidden {
+    display: none;
+}
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    max-width: 1024px;
+    width: 95%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    position: relative;
+    padding: 1rem;
+}
+.modal-content img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+}
+.modal-caption {
+    margin-top: 0.5rem;
+    text-align: center;
+    color: var(--text-light);
+}
+.modal-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    border: none;
+    background: var(--primary-color);
+    color: #fff;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 32px;
 }
 
 /* Mejoras de accesibilidad en foco */
