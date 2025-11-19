@@ -105,26 +105,52 @@ function getTValue(df, confidenceLevel) {
     const upperTail = 1 - alpha;
     
     // Si los grados de libertad no están en la tabla, usar interpolación o aproximación
-    if (df in tTable) {
-        return tTable[df][upperTail] || 2.0;
+    // Si existe entrada exacta para df
+    if (df in tTable && tTable[df] && (upperTail in tTable[df])) {
+        return tTable[df][upperTail];
     }
-    
-    // Aproximación para grados de libertad grandes
-    if (df > 120) {
+
+    // Para df muy grandes, aproximamos con Z
+    const availableDfs = Object.keys(tTable).map(Number).sort((a, b) => a - b);
+    const minDf = availableDfs[0];
+    const maxDf = availableDfs[availableDfs.length - 1];
+
+    if (df >= maxDf) {
+        // usar el último valor disponible (o aproximar con Z)
+        const last = tTable[maxDf];
+        return (last && last[upperTail]) ? last[upperTail] : getZValue(confidenceLevel);
+    }
+
+    if (df <= minDf) {
+        const first = tTable[minDf];
+        return (first && first[upperTail]) ? first[upperTail] : getZValue(confidenceLevel);
+    }
+
+    // Encontrar los df disponibles inmediatamente por debajo y por encima
+    let lowerKey = minDf;
+    let upperKey = maxDf;
+    for (let i = 0; i < availableDfs.length; i++) {
+        const k = availableDfs[i];
+        if (k <= df) lowerKey = k;
+        if (k >= df) { upperKey = k; break; }
+    }
+
+    const lowerRow = tTable[lowerKey] || {};
+    const upperRow = tTable[upperKey] || {};
+    const lowerValue = lowerRow[upperTail] != null ? lowerRow[upperTail] : null;
+    const upperValue = upperRow[upperTail] != null ? upperRow[upperTail] : null;
+
+    if (lowerValue == null && upperValue == null) {
         return getZValue(confidenceLevel);
     }
-    
-    // Interpolación simple
-    const lowerDf = Math.floor(df);
-    const upperDf = Math.ceil(df);
-    
-    if (lowerDf === upperDf) {
-        return tTable[lowerDf][upperTail] || 2.0;
-    }
-    
-    const lowerValue = tTable[lowerDf][upperTail];
-    const upperValue = tTable[upperDf][upperTail];
-    return lowerValue + (upperValue - lowerValue) * (df - lowerDf);
+    if (lowerValue == null) return upperValue;
+    if (upperValue == null) return lowerValue;
+
+    if (lowerKey === upperKey) return lowerValue;
+
+    // Interpolación lineal entre los dos puntos conocidos
+    const fraction = (df - lowerKey) / (upperKey - lowerKey);
+    return lowerValue + (upperValue - lowerValue) * fraction;
 }
 
 // Función para obtener valor Chi-Cuadrado
